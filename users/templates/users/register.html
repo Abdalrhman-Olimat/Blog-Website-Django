@@ -1,0 +1,51 @@
+{% extends "blog/base.html" %}
+
+{% block content %}
+    <div class="auth-card">
+        
+        <!-- Form structure using POST and CSRF protection -->
+        <form method="POST" class="auth-form">
+            {% csrf_token %}
+            
+            <fieldset class="form-fieldset">
+                <legend class="form-legend">Join Today</legend>
+                
+                <!-- Manually loop through all fields to render them with custom classes -->
+                {% for field in form %}
+                    <div class="form-field">
+                        
+                        <!-- Field Label -->
+                        {{ field.label_tag }}
+                        
+                        <!-- Field Input -->
+                        {{ field }}
+                        
+                        <!-- Field Help Text -->
+                        {% if field.help_text %}
+                            <small class="form-help-text">{{ field.help_text }}</small>
+                        {% endif %}
+                        
+                        <!-- Field Errors -->
+                        {% for error in field.errors %}
+                            <span class="form-error">{{ error }}</span>
+                        {% endfor %}
+                    </div>
+                {% endfor %}
+
+            </fieldset>
+            
+            <div class="form-actions">
+                <button class="btn btn-primary" type="submit">Sign Up</button>
+            </div>
+        </form>
+        
+        <!-- Link to Login Page -->
+        <div class="form-footer">
+            <small class="form-small-text">
+                Already Have An Account? 
+                <a class="footer-link" href="{% url 'login' %}">Sign In</a>
+            </small>
+        </div>
+        
+    </div>
+{% endblock content %}

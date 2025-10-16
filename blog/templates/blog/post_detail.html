@@ -1,0 +1,49 @@
+{% extends "blog/base.html" %}
+
+{% block content %}
+    <article class="article-card post-detail">
+        <!-- Author Info Section -->
+        <div class="post-author-section">
+            <div class="author-image-wrapper">
+                {% if object.author.profile.image %}
+                    <img class="author-image-small" src="{{ object.author.profile.image.url }}" alt="{{ object.author.username }}">
+                {% else %}
+                    <div class="author-image-placeholder-small">
+                        <span class="author-initials-small">{{ object.author.username|slice:":2"|upper }}</span>
+                    </div>
+                {% endif %}
+            </div>
+            <div class="author-info">
+                <div class="article-meta">
+                    By <a href="#">{{ object.author }}</a>
+                </div>
+                <div class="article-date">
+                    {{ object.date_posted|date:"F d, Y - g:i A" }}
+                </div>
+            </div>
+        </div>
+
+        <!-- Post Title -->
+        <h1 class="article-title post-detail-title">
+            {{ object.title }}
+        </h1>
+
+        <!-- Post Content -->
+        <div class="post-detail-content">
+            {{ object.content|linebreaks }}
+        </div>
+
+        <!-- Action Buttons (if user is author) -->
+        {% if object.author == user %}
+            <div class="post-actions">
+                <a href="{% url 'post-update' object.id %}" class="btn btn-secondary btn-small">Edit Post</a>
+                <a href="{% url 'post-delete' object.id %}" class="btn btn-danger btn-small">Delete Post</a>
+            </div>
+        {% endif %}
+
+        <!-- Back to Posts Link -->
+        <div class="post-back-link">
+            <a href="{% url 'blog-home' %}">&larr; Back to All Posts</a>
+        </div>
+    </article>
+{% endblock content %}

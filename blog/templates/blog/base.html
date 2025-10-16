@@ -1,0 +1,68 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <!-- Essential for responsive design -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta charset="UTF-8" />
+
+    <!-- Link your custom, pure CSS file -->
+    <link rel="stylesheet" type="text/css" href="{% static 'blog/main.css' %}" />
+
+    <!-- Using Inter font for clean look -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet" />
+
+    {% if title %}
+      <title>Django Blog - {{ title }}</title>
+    {% else %}
+      <title>Django Blog</title>
+    {% endif %}
+  </head>
+  <body>
+    <header class="main-header">
+      <nav class="navbar">
+        <a href="{% url 'blog-home' %}" class="logo">My Django Blog</a>
+        <div class="navbar-links">
+          <a href="{% url 'blog-home' %}">Home</a>
+          <a href="{% url 'blog-about' %}">About</a>
+
+          <!-- Authentication Links -->
+          {% if user.is_authenticated %}
+          <a href="{% url 'post-create' %}">Create Post</a>
+            <a href="{% url 'profile' %}">Profile</a>
+            <a href="{% url 'logout' %}">Logout</a>
+          {% else %}
+            <a href="{% url 'login' %}">Sign In</a>
+            <a href="{% url 'register' %}">Sign Up</a>
+          {% endif %}
+        </div>
+      </nav>
+    </header>
+
+    <main class="container">
+      <!-- Main content area, including flash messages -->
+      <!-- Flash Message Display Block -->
+      {% if messages %}
+        {% for message in messages %}
+          <!-- We use custom classes 'flash-message' and 'flash-{{ message.tags }}' -->
+          <div class="flash-message flash-{{ message.tags }}">{{ message }}</div>
+        {% endfor %}
+      {% endif %}
+      <section class="content-section">
+        {% block content %}
+          <!-- Content from home.html or about.html loads here -->
+        {% endblock %}
+      </section>
+
+      <!-- Sidebar for future features (e.g., popular posts, author info) -->
+      <aside class="sidebar-section">
+        <h3>Sidebar</h3>
+        <p>Welcome to the blog! This area is reserved for contextual information.</p>
+      </aside>
+    </main>
+
+    <footer class="main-footer">
+      <p>&copy; 2025 Django Capstone Blog | Built by Abdalrhman Olimat</p>
+    </footer>
+  </body>
+</html>

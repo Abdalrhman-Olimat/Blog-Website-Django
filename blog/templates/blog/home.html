@@ -1,0 +1,20 @@
+{% extends "blog/base.html" %}
+
+{% block content %}
+    <h1 class="page-heading">All Blog Posts</h1>
+    
+    {% for post in posts %}
+        <article class="article-card">
+            <h2 class="article-title">
+                <a href="{% url 'post-detail' post.id %}">{{ post.title }}</a>
+            </h2>
+            <div class="article-meta">
+                By <a href="#">{{ post.author }}</a> on {{ post.date_posted|date:"F d, Y" }}
+            </div>
+            <p class="article-content-preview">
+                {{ post.content|truncatechars:150 }} 
+                <a href="{% url 'post-detail' post.id %}">Read More...</a>
+            </p>
+        </article>
+    {% endfor %}
+{% endblock content %}

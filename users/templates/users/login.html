@@ -1,0 +1,51 @@
+{% extends "blog/base.html" %}
+
+{% block content %}
+    <div class="auth-card">
+        <form method="POST" class="auth-form">
+            {% csrf_token %}
+            <fieldset class="form-fieldset">
+                <legend class="form-legend">Sign In</legend>
+                
+                <!-- Display Non-Field Errors -->
+                {% if form.non_field_errors %}
+                    <ul class="errorlist">
+                        {% for error in form.non_field_errors %}
+                            <li>{{ error }}</li>
+                        {% endfor %}
+                    </ul>
+                {% endif %}
+
+                <!-- Manual Field Rendering Loop -->
+                {% for field in form %}
+                <div class="form-field">
+                    {{ field.label_tag }}
+                    {{ field }}
+                    {% if field.help_text %}
+                        <small class="form-help-text">{{ field.help_text }}</small>
+                    {% endif %}
+                    {% for error in field.errors %}
+                        <span class="form-error">{{ error }}</span>
+                    {% endfor %}
+                </div>
+                {% endfor %}
+
+            </fieldset>
+            
+            <div class="form-actions">
+                <button class="btn btn-primary" type="submit">Sign In</button>
+            </div>
+        </form>
+        
+        <div class="form-footer">
+            <small class="form-small-text">
+                Need An Account? <a href="{% url 'register' %}" class="ml-2">Sign Up</a>
+            </small>
+            <br>
+            <small class="form-small-text">
+                <a href="#" class="ml-2">Forgot Password?</a>
+                {% comment %} <a href="{% url 'password_reset' %}" class="ml-2">Forgot Password?</a> {% endcomment %}
+            </small>
+        </div>
+    </div>
+{% endblock content %}

@@ -1,0 +1,61 @@
+{% extends "blog/base.html" %}
+
+{% block content %}
+    <div class="auth-card">
+        <div class="profile-header">
+            <h2 class="form-legend">{{ user.username }}'s Profile</h2>
+        </div>
+
+        <div class="profile-content">
+            <!-- Profile Image Section -->
+            <div class="profile-image-section">
+                {% if user.profile.image %}
+                    <img src="{{ user.profile.image.url }}" alt="Profile Picture" class="profile-image">
+                {% else %}
+                    <div class="profile-image-placeholder">
+                        <span class="profile-initials">{{ user.username|slice:":2"|upper }}</span>
+                    </div>
+                {% endif %}
+            </div>
+
+            <!-- Profile Information -->
+            <div class="profile-info">
+                <div class="form-field">
+                    <label class="profile-label">Username</label>
+                    <p class="profile-value">{{ user.username }}</p>
+                </div>
+
+                <div class="form-field">
+                    <label class="profile-label">Email</label>
+                    <p class="profile-value">{{ user.email }}</p>
+                </div>
+
+                <div class="form-field">
+                    <label class="profile-label">Member Since</label>
+                    <p class="profile-value">{{ user.date_joined|date:"F d, Y" }}</p>
+                </div>
+
+                <div class="form-field">
+                    <label class="profile-label">Last Login</label>
+                    <p class="profile-value">{{ user.last_login|date:"F d, Y - g:i A" }}</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="form-actions">
+            <a href="#" class="btn btn-primary">Edit Profile</a>
+            {% comment %}
+            <!-- For future implementation -->
+            <a href="{% url 'profile-update' %}" class="btn btn-primary">Edit Profile</a>
+            {% endcomment %}
+        </div>
+
+        <!-- Additional Info Section -->
+        <div class="form-footer">
+            <small class="form-small-text">
+                Want to update your information? Click "Edit Profile" above.
+            </small>
+        </div>
+    </div>
+{% endblock content %}

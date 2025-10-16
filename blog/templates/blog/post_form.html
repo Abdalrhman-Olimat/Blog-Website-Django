@@ -1,0 +1,74 @@
+{% extends "blog/base.html" %}
+
+{% block content %}
+    <div class="auth-card post-form-card">
+        
+        <!-- Form structure using POST and CSRF protection -->
+        <form method="POST" class="auth-form">
+            {% csrf_token %}
+            
+            <fieldset class="form-fieldset">
+                <!-- Dynamic legend based on whether we're creating or updating -->
+                {% if form.instance.pk %}
+                    <legend class="form-legend">Edit Blog Post</legend>
+                {% else %}
+                    <legend class="form-legend">Create New Blog Post</legend>
+                {% endif %}
+
+                <!-- Display Non-Field Errors -->
+                {% if form.non_field_errors %}
+                    <ul class="errorlist">
+                        {% for error in form.non_field_errors %}
+                            <li>{{ error }}</li>
+                        {% endfor %}
+                    </ul>
+                {% endif %}
+
+                <!-- Manually loop through all fields to render them with custom classes -->
+                {% for field in form %}
+                    <div class="form-field">
+                        
+                        <!-- Field Label -->
+                        {{ field.label_tag }}
+                        
+                        <!-- Field Input -->
+                        {{ field }}
+                        
+                        <!-- Field Help Text -->
+                        {% if field.help_text %}
+                            <small class="form-help-text">{{ field.help_text }}</small>
+                        {% endif %}
+                        
+                        <!-- Field Errors -->
+                        {% for error in field.errors %}
+                            <span class="form-error">{{ error }}</span>
+                        {% endfor %}
+                    </div>
+                {% endfor %}
+
+            </fieldset>
+            
+            <div class="form-actions form-actions-multiple">
+                <!-- Dynamic button text -->
+                {% if form.instance.pk %}
+                    <button class="btn btn-primary" type="submit">Update Post</button>
+                {% else %}
+                    <button class="btn btn-primary" type="submit">Create Post</button>
+                {% endif %}
+                <a href="{% url 'blog-home' %}" class="btn btn-secondary">Cancel</a>
+            </div>
+        </form>
+        
+        <!-- Helper text at the bottom -->
+        <div class="form-footer">
+            <small class="form-small-text">
+                {% if form.instance.pk %}
+                    Make changes to your post and click "Update Post" to save.
+                {% else %}
+                    Share your thoughts with the world! Fill in the form above to create a new blog post.
+                {% endif %}
+            </small>
+        </div>
+        
+    </div>
+{% endblock content %}
