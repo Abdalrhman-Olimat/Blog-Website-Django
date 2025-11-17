@@ -1,49 +1,225 @@
 {% extends "blog/base.html" %}
 
 {% block content %}
-    <article class="article-card post-detail">
-        <!-- Author Info Section -->
-        <div class="post-author-section">
-            <div class="author-image-wrapper">
-                {% if object.author.profile.image %}
-                    <img class="author-image-small" src="{{ object.author.profile.image.url }}" alt="{{ object.author.username }}">
-                {% else %}
-                    <div class="author-image-placeholder-small">
-                        <span class="author-initials-small">{{ object.author.username|slice:":2"|upper }}</span>
-                    </div>
-                {% endif %}
-            </div>
-            <div class="author-info">
-                <div class="article-meta">
-                    By <a href="#">{{ object.author }}</a>
-                </div>
-                <div class="article-date">
-                    {{ object.date_posted|date:"F d, Y - g:i A" }}
-                </div>
-            </div>
+<div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+  <!-- Breadcrumb Navigation -->
+  <nav class="mb-8 text-sm">
+    <ol class="flex items-center space-x-2 text-gray-600 dark:text-gray-400">
+      <li><a href="{% url 'blog-home' %}" class="hover:text-primary-600 transition-colors"><i class="fas fa-home"></i> Home</a></li>
+      <li><i class="fas fa-chevron-right text-xs"></i></li>
+      <li class="text-gray-900 dark:text-white font-medium truncate max-w-xs">{{ object.title|truncatechars:50 }}</li>
+    </ol>
+  </nav>
+
+  <!-- Main Article Container -->
+  <article class="bg-white dark:bg-gray-800 rounded-2xl shadow-xl overflow-hidden">
+    <!-- Article Header with Gradient -->
+    <div class="bg-gradient-to-r from-primary-600 via-primary-700 to-primary-800 px-8 py-12 sm:px-12 sm:py-16">
+      <!-- Category Badge -->
+      <div class="mb-6">
+        <span class="px-4 py-2 bg-white bg-opacity-20 text-white text-sm font-semibold rounded-full backdrop-blur-sm">
+          <i class="fas fa-tag mr-2"></i>Article
+        </span>
+      </div>
+
+      <!-- Post Title -->
+      <h1 class="text-4xl sm:text-5xl font-extrabold text-white mb-6 leading-tight">
+        {{ object.title }}
+      </h1>
+
+      <!-- Author Info and Meta -->
+      <div class="flex flex-wrap items-center gap-6 text-primary-100">
+        <div class="flex items-center">
+          <div class="w-12 h-12 rounded-full bg-white bg-opacity-20 backdrop-blur-sm flex items-center justify-center text-white font-bold text-lg mr-3 ring-4 ring-white ring-opacity-30">
+            {% if object.author.profile.image %}
+              <img class="w-12 h-12 rounded-full object-cover" src="{{ object.author.profile.image.url }}" alt="{{ object.author.username }}">
+            {% else %}
+              {{ object.author.username|slice:":1"|upper }}
+            {% endif %}
+          </div>
+          <div>
+            <a href="#" class="text-white font-semibold hover:text-primary-200 transition-colors text-lg">
+              {{ object.author.username }}
+            </a>
+            <p class="text-sm text-primary-200">Author</p>
+          </div>
         </div>
 
-        <!-- Post Title -->
-        <h1 class="article-title post-detail-title">
-            {{ object.title }}
-        </h1>
+        <div class="flex items-center space-x-6 text-sm">
+          <div class="flex items-center">
+            <i class="far fa-calendar mr-2"></i>
+            <span>{{ object.date_posted|date:"F d, Y" }}</span>
+          </div>
+          <div class="flex items-center">
+            <i class="far fa-clock mr-2"></i>
+            <span>{{ object.date_posted|timesince }} ago</span>
+          </div>
+          <div class="flex items-center">
+            <i class="far fa-eye mr-2"></i>
+            <span>0 views</span>
+          </div>
+        </div>
+      </div>
+    </div>
 
-        <!-- Post Content -->
-        <div class="post-detail-content">
-            {{ object.content|linebreaks }}
+    <!-- Article Content -->
+    <div class="px-8 py-12 sm:px-12">
+      <!-- Reading Progress Bar -->
+      <div id="reading-progress" class="fixed top-16 left-0 h-1 bg-primary-600 z-40 transition-all duration-150" style="width: 0%"></div>
+
+      <!-- Article Body -->
+      <div class="prose prose-lg dark:prose-invert max-w-none mb-12">
+        <div class="text-gray-700 dark:text-gray-300 leading-relaxed text-lg space-y-6">
+          {{ object.content|linebreaks }}
+        </div>
+      </div>
+
+      <!-- Article Footer -->
+      <div class="border-t border-gray-200 dark:border-gray-700 pt-8">
+        <!-- Tags Section (placeholder) -->
+        <div class="mb-8">
+          <h3 class="text-sm font-semibold text-gray-900 dark:text-white mb-3">Tags:</h3>
+          <div class="flex flex-wrap gap-2">
+            <span class="px-3 py-1 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 text-sm rounded-full hover:bg-primary-100 dark:hover:bg-primary-900 transition-colors cursor-pointer">
+              <i class="fas fa-hashtag text-xs"></i> Technology
+            </span>
+            <span class="px-3 py-1 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 text-sm rounded-full hover:bg-primary-100 dark:hover:bg-primary-900 transition-colors cursor-pointer">
+              <i class="fas fa-hashtag text-xs"></i> Writing
+            </span>
+            <span class="px-3 py-1 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 text-sm rounded-full hover:bg-primary-100 dark:hover:bg-primary-900 transition-colors cursor-pointer">
+              <i class="fas fa-hashtag text-xs"></i> Blog
+            </span>
+          </div>
+        </div>
+
+        <!-- Social Share Buttons -->
+        <div class="mb-8">
+          <h3 class="text-sm font-semibold text-gray-900 dark:text-white mb-3">Share this article:</h3>
+          <div class="flex flex-wrap gap-3">
+            <button onclick="shareOnTwitter()" class="px-4 py-2 bg-blue-400 text-white rounded-lg hover:bg-blue-500 transition-colors flex items-center space-x-2">
+              <i class="fab fa-twitter"></i>
+              <span>Twitter</span>
+            </button>
+            <button onclick="shareOnFacebook()" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center space-x-2">
+              <i class="fab fa-facebook-f"></i>
+              <span>Facebook</span>
+            </button>
+            <button onclick="shareOnLinkedIn()" class="px-4 py-2 bg-blue-700 text-white rounded-lg hover:bg-blue-800 transition-colors flex items-center space-x-2">
+              <i class="fab fa-linkedin-in"></i>
+              <span>LinkedIn</span>
+            </button>
+            <button onclick="copyLink()" class="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors flex items-center space-x-2">
+              <i class="fas fa-link"></i>
+              <span>Copy Link</span>
+            </button>
+          </div>
         </div>
 
         <!-- Action Buttons (if user is author) -->
         {% if object.author == user %}
-            <div class="post-actions">
-                <a href="{% url 'post-update' object.id %}" class="btn btn-secondary btn-small">Edit Post</a>
-                <a href="{% url 'post-delete' object.id %}" class="btn btn-danger btn-small">Delete Post</a>
+          <div class="bg-primary-50 dark:bg-gray-700 rounded-xl p-6 mb-8">
+            <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+              <i class="fas fa-user-edit mr-2"></i>You're the author
+            </h3>
+            <div class="flex flex-wrap gap-3">
+              <a href="{% url 'post-update' object.id %}" class="px-6 py-3 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-all duration-200 font-medium flex items-center shadow-md hover:shadow-lg transform hover:-translate-y-0.5">
+                <i class="fas fa-edit mr-2"></i>Edit Post
+              </a>
+              <a href="{% url 'post-delete' object.id %}" class="px-6 py-3 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-all duration-200 font-medium flex items-center shadow-md hover:shadow-lg transform hover:-translate-y-0.5">
+                <i class="fas fa-trash-alt mr-2"></i>Delete Post
+              </a>
             </div>
+          </div>
         {% endif %}
+      </div>
+    </div>
 
-        <!-- Back to Posts Link -->
-        <div class="post-back-link">
-            <a href="{% url 'blog-home' %}">&larr; Back to All Posts</a>
+    <!-- Author Card -->
+    <div class="bg-gray-50 dark:bg-gray-700 px-8 py-8 sm:px-12 border-t border-gray-200 dark:border-gray-600">
+      <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-6">About the Author</h3>
+      <div class="flex flex-col sm:flex-row items-start sm:items-center space-y-4 sm:space-y-0 sm:space-x-6">
+        <div class="w-24 h-24 rounded-full bg-gradient-to-br from-primary-400 to-primary-600 flex items-center justify-center text-white font-bold text-3xl flex-shrink-0 ring-4 ring-primary-200 dark:ring-primary-800">
+          {% if object.author.profile.image %}
+            <img class="w-24 h-24 rounded-full object-cover" src="{{ object.author.profile.image.url }}" alt="{{ object.author.username }}">
+          {% else %}
+            {{ object.author.username|slice:":1"|upper }}
+          {% endif %}
         </div>
-    </article>
+        <div class="flex-1">
+          <h4 class="text-xl font-bold text-gray-900 dark:text-white mb-2">{{ object.author.username }}</h4>
+          <p class="text-gray-600 dark:text-gray-300 mb-3">
+            Passionate writer and content creator. Member since {{ object.author.date_joined|date:"F Y" }}.
+          </p>
+          <a href="#" class="inline-flex items-center text-primary-600 dark:text-primary-400 hover:text-primary-700 font-semibold">
+            View Profile
+            <i class="fas fa-arrow-right ml-2"></i>
+          </a>
+        </div>
+      </div>
+    </div>
+  </article>
+
+  <!-- Navigation Buttons -->
+  <div class="mt-8 flex justify-between items-center">
+    <a href="{% url 'blog-home' %}" class="inline-flex items-center px-6 py-3 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-200 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-all duration-200 shadow-md font-medium">
+      <i class="fas fa-arrow-left mr-2"></i>Back to All Posts
+    </a>
+    
+    <button onclick="window.scrollTo({top: 0, behavior: 'smooth'})" class="inline-flex items-center px-6 py-3 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-all duration-200 shadow-md font-medium">
+      <i class="fas fa-arrow-up mr-2"></i>Back to Top
+    </button>
+  </div>
+
+  <!-- Related Posts Section (Placeholder) -->
+  <div class="mt-16">
+    <h2 class="text-3xl font-bold text-gray-900 dark:text-white mb-8">
+      <i class="fas fa-book-reader text-primary-600 mr-3"></i>You May Also Like
+    </h2>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <!-- Placeholder for related posts -->
+      <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 text-center">
+        <div class="w-16 h-16 bg-gray-100 dark:bg-gray-700 rounded-full flex items-center justify-center mx-auto mb-4">
+          <i class="fas fa-newspaper text-3xl text-gray-400"></i>
+        </div>
+        <p class="text-gray-600 dark:text-gray-400">More posts coming soon!</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- JavaScript for Interactive Features -->
+<script>
+  // Reading Progress Bar
+  window.addEventListener('scroll', function() {
+    const winScroll = document.body.scrollTop || document.documentElement.scrollTop;
+    const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+    const scrolled = (winScroll / height) * 100;
+    document.getElementById('reading-progress').style.width = scrolled + '%';
+  });
+
+  // Social Share Functions
+  function shareOnTwitter() {
+    const url = window.location.href;
+    const text = "{{ object.title|escapejs }}";
+    window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(url)}`, '_blank', 'width=600,height=400');
+  }
+
+  function shareOnFacebook() {
+    const url = window.location.href;
+    window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`, '_blank', 'width=600,height=400');
+  }
+
+  function shareOnLinkedIn() {
+    const url = window.location.href;
+    window.open(`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(url)}`, '_blank', 'width=600,height=400');
+  }
+
+  function copyLink() {
+    const url = window.location.href;
+    navigator.clipboard.writeText(url).then(() => {
+      alert('Link copied to clipboard!');
+    });
+  }
+</script>
+
 {% endblock content %}

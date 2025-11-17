@@ -1,51 +1,168 @@
 {% extends "blog/base.html" %}
 
 {% block content %}
-    <div class="auth-card">
-        
-        <!-- Form structure using POST and CSRF protection -->
-        <form method="POST" class="auth-form">
-            {% csrf_token %}
-            
-            <fieldset class="form-fieldset">
-                <legend class="form-legend">Join Today</legend>
-                
-                <!-- Manually loop through all fields to render them with custom classes -->
-                {% for field in form %}
-                    <div class="form-field">
-                        
-                        <!-- Field Label -->
-                        {{ field.label_tag }}
-                        
-                        <!-- Field Input -->
-                        {{ field }}
-                        
-                        <!-- Field Help Text -->
-                        {% if field.help_text %}
-                            <small class="form-help-text">{{ field.help_text }}</small>
-                        {% endif %}
-                        
-                        <!-- Field Errors -->
-                        {% for error in field.errors %}
-                            <span class="form-error">{{ error }}</span>
-                        {% endfor %}
-                    </div>
-                {% endfor %}
-
-            </fieldset>
-            
-            <div class="form-actions">
-                <button class="btn btn-primary" type="submit">Sign Up</button>
+<div class="min-h-screen flex items-center justify-center px-4 sm:px-6 lg:px-8 py-12">
+  <div class="max-w-6xl w-full">
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-0 bg-white dark:bg-gray-800 rounded-2xl shadow-2xl overflow-hidden">
+      
+      <!-- Left Side - Image/Illustration -->
+      <div class="hidden lg:block relative bg-gradient-to-br from-primary-600 via-primary-700 to-primary-800 p-12">
+        <div class="h-full flex flex-col justify-center text-white">
+          <div class="mb-8">
+            <i class="fas fa-rocket text-6xl text-white opacity-20 mb-6"></i>
+            <h2 class="text-4xl font-bold mb-6">Join Our Community</h2>
+            <p class="text-xl text-primary-100 mb-8">
+              Create an account and start sharing your amazing stories with thousands of readers.
+            </p>
+          </div>
+          
+          <div class="space-y-6">
+            <div class="flex items-center">
+              <i class="fas fa-check-circle text-3xl text-green-300 mr-4"></i>
+              <div>
+                <h3 class="font-semibold text-lg">Free to Join</h3>
+                <p class="text-primary-100">No credit card required</p>
+              </div>
             </div>
-        </form>
-        
-        <!-- Link to Login Page -->
-        <div class="form-footer">
-            <small class="form-small-text">
-                Already Have An Account? 
-                <a class="footer-link" href="{% url 'login' %}">Sign In</a>
-            </small>
+            
+            <div class="flex items-center">
+              <i class="fas fa-check-circle text-3xl text-green-300 mr-4"></i>
+              <div>
+                <h3 class="font-semibold text-lg">Easy Publishing</h3>
+                <p class="text-primary-100">Write and publish in minutes</p>
+              </div>
+            </div>
+            
+            <div class="flex items-center">
+              <i class="fas fa-check-circle text-3xl text-green-300 mr-4"></i>
+              <div>
+                <h3 class="font-semibold text-lg">Engaged Audience</h3>
+                <p class="text-primary-100">Connect with passionate readers</p>
+              </div>
+            </div>
+          </div>
         </div>
-        
+      </div>
+
+      <!-- Right Side - Form -->
+      <div class="px-8 py-12 sm:px-12 lg:px-16">
+        <!-- Logo and Title -->
+        <div class="mb-8">
+          <a href="{% url 'blog-home' %}" class="flex items-center space-x-2 mb-6">
+            <div class="w-10 h-10 bg-gradient-to-br from-primary-500 to-primary-700 rounded-lg flex items-center justify-center">
+              <i class="fas fa-feather-alt text-white text-lg"></i>
+            </div>
+            <span class="text-2xl font-bold bg-gradient-to-r from-primary-600 to-primary-800 bg-clip-text text-transparent">BlogHub</span>
+          </a>
+          <h1 class="text-3xl font-bold text-gray-900 dark:text-white mb-2">Create Account</h1>
+          <p class="text-gray-600 dark:text-gray-400">Join us and start your writing journey</p>
+        </div>
+
+        <!-- Form -->
+        <form method="POST" class="space-y-5">
+          {% csrf_token %}
+          
+          <!-- Form Fields -->
+          {% for field in form %}
+            <div>
+              <label for="{{ field.id_for_label }}" class="block text-sm font-semibold text-gray-900 dark:text-white mb-2">
+                {{ field.label }}
+                {% if field.field.required %}
+                  <span class="text-red-500">*</span>
+                {% endif %}
+              </label>
+              <div class="relative">
+                {% if field.name == 'username' %}
+                  <i class="fas fa-user absolute left-4 top-4 text-gray-400"></i>
+                  <input 
+                    type="text" 
+                    name="{{ field.name }}" 
+                    id="{{ field.id_for_label }}"
+                    value="{{ field.value|default:'' }}"
+                    required
+                    maxlength="150"
+                    class="w-full pl-12 pr-4 py-3 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-200 text-gray-900 dark:text-white"
+                    placeholder="Choose a username"
+                  />
+                {% elif field.name == 'email' %}
+                  <i class="fas fa-envelope absolute left-4 top-4 text-gray-400"></i>
+                  <input 
+                    type="email" 
+                    name="{{ field.name }}" 
+                    id="{{ field.id_for_label }}"
+                    value="{{ field.value|default:'' }}"
+                    required
+                    class="w-full pl-12 pr-4 py-3 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-200 text-gray-900 dark:text-white"
+                    placeholder="your@email.com"
+                  />
+                {% elif 'password' in field.name %}
+                  <i class="fas fa-lock absolute left-4 top-4 text-gray-400"></i>
+                  <input 
+                    type="password" 
+                    name="{{ field.name }}" 
+                    id="{{ field.id_for_label }}"
+                    required
+                    class="w-full pl-12 pr-4 py-3 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-200 text-gray-900 dark:text-white"
+                    placeholder="{% if 'password2' in field.name %}Confirm your password{% else %}Create a strong password{% endif %}"
+                  />
+                {% else %}
+                  {{ field }}
+                {% endif %}
+              </div>
+              
+              {% if field.help_text %}
+                <div class="mt-2 text-xs text-gray-600 dark:text-gray-400 space-y-1">
+                  {% if 'password' in field.name %}
+                    <ul class="list-disc list-inside space-y-1">
+                      <li>At least 8 characters long</li>
+                      <li>Mix of letters and numbers</li>
+                      <li>Include special characters</li>
+                    </ul>
+                  {% else %}
+                    <p>{{ field.help_text|striptags }}</p>
+                  {% endif %}
+                </div>
+              {% endif %}
+              
+              {% if field.errors %}
+                <div class="mt-2">
+                  {% for error in field.errors %}
+                    <p class="text-sm text-red-600 dark:text-red-400 flex items-start">
+                      <i class="fas fa-exclamation-triangle mr-2 mt-0.5"></i>
+                      <span>{{ error|striptags }}</span>
+                    </p>
+                  {% endfor %}
+                </div>
+              {% endif %}
+            </div>
+          {% endfor %}
+
+          <!-- Terms & Conditions -->
+          <div class="flex items-start">
+            <input type="checkbox" required class="w-4 h-4 text-primary-600 border-gray-300 rounded focus:ring-primary-500 mt-1">
+            <label class="ml-2 text-sm text-gray-600 dark:text-gray-400">
+              I agree to the <a href="#" class="text-primary-600 hover:text-primary-700 font-medium">Terms of Service</a> and <a href="#" class="text-primary-600 hover:text-primary-700 font-medium">Privacy Policy</a>
+            </label>
+          </div>
+
+          <!-- Submit Button -->
+          <button 
+            type="submit" 
+            class="w-full px-6 py-4 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-all duration-200 font-semibold shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 flex items-center justify-center">
+            <i class="fas fa-user-plus mr-2"></i>
+            Create Account
+          </button>
+        </form>
+
+        <!-- Footer Links -->
+        <div class="mt-8 text-center">
+          <p class="text-gray-600 dark:text-gray-400">
+            Already have an account?
+            <a href="{% url 'login' %}" class="font-semibold text-primary-600 hover:text-primary-700 dark:text-primary-400 ml-1">Sign In</a>
+          </p>
+        </div>
+      </div>
     </div>
+  </div>
+</div>
 {% endblock content %}

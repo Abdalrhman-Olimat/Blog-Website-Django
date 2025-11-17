@@ -1,74 +1,328 @@
 {% extends "blog/base.html" %}
 
 {% block content %}
-    <div class="auth-card post-form-card">
-        
-        <!-- Form structure using POST and CSRF protection -->
-        <form method="POST" class="auth-form">
-            {% csrf_token %}
-            
-            <fieldset class="form-fieldset">
-                <!-- Dynamic legend based on whether we're creating or updating -->
-                {% if form.instance.pk %}
-                    <legend class="form-legend">Edit Blog Post</legend>
-                {% else %}
-                    <legend class="form-legend">Create New Blog Post</legend>
-                {% endif %}
+<div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+  <!-- Breadcrumb -->
+  <nav class="mb-8 text-sm">
+    <ol class="flex items-center space-x-2 text-gray-600 dark:text-gray-400">
+      <li><a href="{% url 'blog-home' %}" class="hover:text-primary-600 transition-colors"><i class="fas fa-home"></i> Home</a></li>
+      <li><i class="fas fa-chevron-right text-xs"></i></li>
+      <li class="text-gray-900 dark:text-white font-medium">
+        {% if form.instance.pk %}Edit Post{% else %}Create Post{% endif %}
+      </li>
+    </ol>
+  </nav>
 
-                <!-- Display Non-Field Errors -->
-                {% if form.non_field_errors %}
-                    <ul class="errorlist">
-                        {% for error in form.non_field_errors %}
-                            <li>{{ error }}</li>
-                        {% endfor %}
-                    </ul>
-                {% endif %}
-
-                <!-- Manually loop through all fields to render them with custom classes -->
-                {% for field in form %}
-                    <div class="form-field">
-                        
-                        <!-- Field Label -->
-                        {{ field.label_tag }}
-                        
-                        <!-- Field Input -->
-                        {{ field }}
-                        
-                        <!-- Field Help Text -->
-                        {% if field.help_text %}
-                            <small class="form-help-text">{{ field.help_text }}</small>
-                        {% endif %}
-                        
-                        <!-- Field Errors -->
-                        {% for error in field.errors %}
-                            <span class="form-error">{{ error }}</span>
-                        {% endfor %}
-                    </div>
-                {% endfor %}
-
-            </fieldset>
-            
-            <div class="form-actions form-actions-multiple">
-                <!-- Dynamic button text -->
-                {% if form.instance.pk %}
-                    <button class="btn btn-primary" type="submit">Update Post</button>
-                {% else %}
-                    <button class="btn btn-primary" type="submit">Create Post</button>
-                {% endif %}
-                <a href="{% url 'blog-home' %}" class="btn btn-secondary">Cancel</a>
-            </div>
-        </form>
-        
-        <!-- Helper text at the bottom -->
-        <div class="form-footer">
-            <small class="form-small-text">
-                {% if form.instance.pk %}
-                    Make changes to your post and click "Update Post" to save.
-                {% else %}
-                    Share your thoughts with the world! Fill in the form above to create a new blog post.
-                {% endif %}
-            </small>
+  <!-- Form Container -->
+  <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-xl overflow-hidden">
+    <!-- Form Header -->
+    <div class="bg-gradient-to-r from-primary-600 to-primary-800 px-8 py-8 sm:px-12">
+      <div class="flex items-center">
+        <div class="w-16 h-16 bg-white bg-opacity-20 backdrop-blur-sm rounded-xl flex items-center justify-center mr-4">
+          {% if form.instance.pk %}
+            <i class="fas fa-edit text-3xl text-white"></i>
+          {% else %}
+            <i class="fas fa-plus-circle text-3xl text-white"></i>
+          {% endif %}
         </div>
-        
+        <div>
+          <h1 class="text-3xl font-bold text-white mb-1">
+            {% if form.instance.pk %}
+              Edit Your Post
+            {% else %}
+              Create New Post
+            {% endif %}
+          </h1>
+          <p class="text-primary-100">
+            {% if form.instance.pk %}
+              Update your post and share it with the community
+            {% else %}
+              Share your story with the world
+            {% endif %}
+          </p>
+        </div>
+      </div>
     </div>
+
+    <!-- Form Body -->
+    <form method="POST" class="px-8 py-8 sm:px-12 space-y-6">
+      {% csrf_token %}
+      
+      <!-- Non-Field Errors -->
+      {% if form.non_field_errors %}
+        <div class="bg-red-50 dark:bg-red-900 dark:bg-opacity-20 border border-red-200 dark:border-red-800 rounded-lg p-4">
+          <div class="flex items-start">
+            <i class="fas fa-exclamation-circle text-red-600 dark:text-red-400 text-xl mr-3 mt-0.5"></i>
+            <div class="flex-1">
+              <h3 class="text-red-800 dark:text-red-300 font-semibold mb-2">Please correct the following errors:</h3>
+              <ul class="list-disc list-inside space-y-1 text-red-700 dark:text-red-400">
+                {% for error in form.non_field_errors %}
+                  <li>{{ error }}</li>
+                {% endfor %}
+              </ul>
+            </div>
+          </div>
+        </div>
+      {% endif %}
+
+      <!-- Form Fields -->
+      {% for field in form %}
+        <div class="form-group">
+          <!-- Label -->
+          <label for="{{ field.id_for_label }}" class="block text-sm font-semibold text-gray-900 dark:text-white mb-2">
+            {{ field.label }}
+            {% if field.field.required %}
+              <span class="text-red-500">*</span>
+            {% endif %}
+          </label>
+
+          <!-- Input Field -->
+          {% if field.name == 'content' %}
+            <!-- Textarea for content -->
+            <textarea 
+              name="{{ field.name }}" 
+              id="{{ field.id_for_label }}"
+              rows="12"
+              {% if field.field.required %}required{% endif %}
+              class="w-full px-4 py-3 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-200 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 resize-y"
+              placeholder="Write your content here... You can write as much as you want!"
+            >{{ field.value|default:'' }}</textarea>
+          {% elif field.name == 'title' %}
+            <!-- Text input for title -->
+            <input 
+              type="text" 
+              name="{{ field.name }}" 
+              id="{{ field.id_for_label }}"
+              value="{{ field.value|default:'' }}"
+              {% if field.field.required %}required{% endif %}
+              maxlength="200"
+              class="w-full px-4 py-3 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-200 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500"
+              placeholder="Enter an engaging title for your post..."
+            />
+          {% else %}
+            {{ field }}
+          {% endif %}
+
+          <!-- Help Text -->
+          {% if field.help_text %}
+            <p class="mt-2 text-sm text-gray-600 dark:text-gray-400 flex items-start">
+              <i class="fas fa-info-circle mr-2 mt-0.5"></i>
+              <span>{{ field.help_text }}</span>
+            </p>
+          {% endif %}
+
+          <!-- Field Errors -->
+          {% if field.errors %}
+            <div class="mt-2">
+              {% for error in field.errors %}
+                <p class="text-sm text-red-600 dark:text-red-400 flex items-start">
+                  <i class="fas fa-exclamation-triangle mr-2 mt-0.5"></i>
+                  <span>{{ error }}</span>
+                </p>
+              {% endfor %}
+            </div>
+          {% endif %}
+
+          <!-- Character Counter for Title -->
+          {% if field.name == 'title' %}
+            <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">
+              <span id="title-char-count">0</span>/200 characters
+            </p>
+          {% endif %}
+
+          <!-- Word Counter for Content -->
+          {% if field.name == 'content' %}
+            <p class="mt-2 text-sm text-gray-500 dark:text-gray-400 flex items-center justify-between">
+              <span><span id="content-word-count">0</span> words</span>
+              <span>Estimated reading time: <span id="reading-time">0</span> min</span>
+            </p>
+          {% endif %}
+        </div>
+      {% endfor %}
+
+      <!-- Writing Tips -->
+      <div class="bg-primary-50 dark:bg-gray-700 rounded-xl p-6">
+        <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-3 flex items-center">
+          <i class="fas fa-lightbulb text-yellow-500 mr-2"></i>
+          Writing Tips
+        </h3>
+        <ul class="space-y-2 text-sm text-gray-700 dark:text-gray-300">
+          <li class="flex items-start">
+            <i class="fas fa-check text-green-500 mr-2 mt-1"></i>
+            <span>Keep your title clear and engaging (under 60 characters works best)</span>
+          </li>
+          <li class="flex items-start">
+            <i class="fas fa-check text-green-500 mr-2 mt-1"></i>
+            <span>Break up long paragraphs for better readability</span>
+          </li>
+          <li class="flex items-start">
+            <i class="fas fa-check text-green-500 mr-2 mt-1"></i>
+            <span>Use clear and concise language to engage your readers</span>
+          </li>
+          <li class="flex items-start">
+            <i class="fas fa-check text-green-500 mr-2 mt-1"></i>
+            <span>Proofread before publishing to catch any typos</span>
+          </li>
+        </ul>
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="flex flex-col sm:flex-row gap-4 pt-6 border-t border-gray-200 dark:border-gray-700">
+        <button 
+          type="submit" 
+          class="flex-1 px-8 py-4 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-all duration-200 font-semibold shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 flex items-center justify-center">
+          {% if form.instance.pk %}
+            <i class="fas fa-save mr-2"></i>Update Post
+          {% else %}
+            <i class="fas fa-paper-plane mr-2"></i>Publish Post
+          {% endif %}
+        </button>
+        
+        <a 
+          href="{% url 'blog-home' %}" 
+          class="flex-1 sm:flex-initial px-8 py-4 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-200 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition-all duration-200 font-semibold text-center flex items-center justify-center">
+          <i class="fas fa-times mr-2"></i>Cancel
+        </a>
+      </div>
+    </form>
+
+    <!-- Footer Help Text -->
+    <div class="bg-gray-50 dark:bg-gray-700 px-8 py-6 sm:px-12 border-t border-gray-200 dark:border-gray-600">
+      <div class="flex items-start text-sm text-gray-600 dark:text-gray-400">
+        <i class="fas fa-shield-alt text-primary-600 dark:text-primary-400 mr-3 mt-0.5"></i>
+        <p>
+          {% if form.instance.pk %}
+            Your changes will be saved and visible to all readers immediately after updating.
+          {% else %}
+            Your post will be published immediately and visible to all readers. Make sure you're happy with it before publishing!
+          {% endif %}
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Preview Card (Optional Enhancement) -->
+  <div class="mt-8 bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-8">
+    <h2 class="text-2xl font-bold text-gray-900 dark:text-white mb-4 flex items-center">
+      <i class="fas fa-eye text-primary-600 mr-3"></i>
+      Live Preview
+    </h2>
+    <div class="border-t border-gray-200 dark:border-gray-700 pt-6">
+      <h3 id="preview-title" class="text-3xl font-bold text-gray-900 dark:text-white mb-4">
+        Your title will appear here...
+      </h3>
+      <div id="preview-content" class="prose dark:prose-invert max-w-none text-gray-700 dark:text-gray-300">
+        <p class="text-gray-400 dark:text-gray-500 italic">Your content will appear here as you type...</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- JavaScript for Interactive Features -->
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const titleInput = document.querySelector('input[name="title"]');
+    const contentTextarea = document.querySelector('textarea[name="content"]');
+    const titleCharCount = document.getElementById('title-char-count');
+    const contentWordCount = document.getElementById('content-word-count');
+    const readingTime = document.getElementById('reading-time');
+    const previewTitle = document.getElementById('preview-title');
+    const previewContent = document.getElementById('preview-content');
+
+    // Character counter for title
+    if (titleInput && titleCharCount) {
+      titleInput.addEventListener('input', function() {
+        const count = this.value.length;
+        titleCharCount.textContent = count;
+        
+        // Update preview
+        previewTitle.textContent = this.value || 'Your title will appear here...';
+        
+        // Warning if too long
+        if (count > 60) {
+          titleCharCount.classList.add('text-yellow-600');
+        } else {
+          titleCharCount.classList.remove('text-yellow-600');
+        }
+      });
+      // Initialize on page load
+      titleCharCount.textContent = titleInput.value.length;
+      if (titleInput.value) {
+        previewTitle.textContent = titleInput.value;
+      }
+    }
+
+    // Word counter and reading time for content
+    if (contentTextarea && contentWordCount) {
+      contentTextarea.addEventListener('input', function() {
+        const text = this.value.trim();
+        const words = text ? text.split(/\s+/).length : 0;
+        contentWordCount.textContent = words;
+        
+        // Calculate reading time (average 200 words per minute)
+        const minutes = Math.ceil(words / 200);
+        readingTime.textContent = minutes || 0;
+        
+        // Update preview
+        if (text) {
+          // Convert line breaks to paragraphs
+          const paragraphs = text.split('\n\n').filter(p => p.trim());
+          previewContent.innerHTML = paragraphs.map(p => `<p>${p.replace(/\n/g, '<br>')}</p>`).join('');
+        } else {
+          previewContent.innerHTML = '<p class="text-gray-400 dark:text-gray-500 italic">Your content will appear here as you type...</p>';
+        }
+      });
+      
+      // Initialize on page load
+      const initialText = contentTextarea.value.trim();
+      if (initialText) {
+        const words = initialText.split(/\s+/).length;
+        contentWordCount.textContent = words;
+        readingTime.textContent = Math.ceil(words / 200);
+        
+        const paragraphs = initialText.split('\n\n').filter(p => p.trim());
+        previewContent.innerHTML = paragraphs.map(p => `<p>${p.replace(/\n/g, '<br>')}</p>`).join('');
+      }
+    }
+
+    // Auto-save to localStorage (optional)
+    const autoSave = () => {
+      if (titleInput && contentTextarea) {
+        localStorage.setItem('draft_title', titleInput.value);
+        localStorage.setItem('draft_content', contentTextarea.value);
+      }
+    };
+
+    // Save every 5 seconds
+    setInterval(autoSave, 5000);
+
+    // Restore draft on page load (only for new posts)
+    {% if not form.instance.pk %}
+      if (titleInput && !titleInput.value) {
+        const draftTitle = localStorage.getItem('draft_title');
+        if (draftTitle) {
+          titleInput.value = draftTitle;
+          titleInput.dispatchEvent(new Event('input'));
+        }
+      }
+      if (contentTextarea && !contentTextarea.value) {
+        const draftContent = localStorage.getItem('draft_content');
+        if (draftContent) {
+          contentTextarea.value = draftContent;
+          contentTextarea.dispatchEvent(new Event('input'));
+        }
+      }
+    {% endif %}
+
+    // Clear draft after successful submission
+    const form = document.querySelector('form');
+    if (form) {
+      form.addEventListener('submit', function() {
+        localStorage.removeItem('draft_title');
+        localStorage.removeItem('draft_content');
+      });
+    }
+  });
+</script>
+
 {% endblock content %}
